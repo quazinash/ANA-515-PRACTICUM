@@ -1,0 +1,132 @@
+Mental Health Survey Data Cleaning and Analysis 
+
+
+---
+title: "Mental Health Survey Data Cleaning and Analysis"
+author: "QUAZI NASHRA AHMAD"
+date: "06-22-2024"
+output: html_document
+---
+
+```{r setup8, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r setup, include=FALSE}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(knitr)
+library(tidyverse)
+
+```
+
+#Justification
+Missing Values
+Empty Strings to NA: Empty strings do not provide any information and should be treated as missing values.
+Specific "NA" Values: Sometimes, "NA" might be inputted as a string instead of being left blank. These need to be converted to proper NA values for consistency.
+Dropping Rows with Missing Age: Age is crucial for this analysis. Without it, the row cannot contribute meaningfully to our study of age distribution.
+Outliers and Errors
+Age Range (18-100): This range is chosen based on typical age expectations for survey respondents. Values outside this range are likely errors or outliers that can distort the analysis.
+Data Type Conversion: Ensuring correct data types allows for accurate computations and visualizations. For example, treating Age as numeric enables arithmetic operations and histogram creation.
+Visualization
+Histogram with Bin Width 5: This bin width provides a balance between granularity and readability, showing detailed distribution without being overly fragmented.
+Bar Graph for Employment Status and Family History: This bar graph allows us to compare the counts of respondents based on their employment status and whether they have a family history of mental illness. By using different colors for family history, we can easily see the distribution and relationship between these two factors.
+
+
+```{r setup1, include=FALSE}
+# Load the data
+getwd()  # Check current working directory
+setwd("C:/Users/Naser/Desktop/QNA")  # Set new working directory
+data <- read.csv("survey.csv")
+```
+
+#We select only the first 5 columns that are most relevant for this analysis: Age, Gender, Country, self_employed, and family_history.
+
+```{r setup2,include=FALSE}
+# Display the structure of the data
+str(data[, c("Age", "Gender", "Country", "self_employed", "family_history")])
+
+# Display the first few rows of the selected columns
+head(data[, c("Age", "Gender", "Country", "self_employed", "family_history")])
+```
+
+#We convert empty strings to NA for easier handling of missing data. We specifically handle columns where "NA" might appear as a string value, converting them to proper NA values.
+
+
+
+```{r setup3, include=FALSE}
+# Select relevant columns
+data <- data %>% select(Age, Gender, Country, self_employed, family_history)
+
+# Convert empty strings to NA
+data[data == ""] <- NA
+
+# Handle specific missing values
+cols_with_na <- c("self_employed", "family_history")
+data[cols_with_na] <- lapply(data[cols_with_na], function(x) ifelse(x == "NA", NA, x))
+
+#We ensure that each column is of the correct data type: Age as numeric, and others as factors. This is crucial for proper analysis and visualization.
+
+# Convert relevant columns to appropriate data types
+data$Age <- as.numeric(data$Age)
+data$Gender <- as.factor(data$Gender)
+data$Country <- as.factor(data$Country)
+data$self_employed <- as.factor(data$self_employed)
+data$family_history <- as.factor(data$family_history)
+
+```
+
+```{r setup4, include=FALSE}
+# Summary of cleaned data
+summary(data)
+```
+
+#We create a histogram to visualize the distribution of Age among survey respondents. The bin width is set to 5 for a clear and detailed distribution.
+
+
+```{r echo=FALSE}
+ggplot(data, aes(x = Age)) +
+  geom_histogram(binwidth = 5, fill = "blue", color = "black", alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "Age Distribution of Survey Respondents",
+       x = "Age",
+       y = "Count")
+
+```
+
+#We create a bar graph to visualize the distribution of gender among survey respondents. The bin width is set to 0.7 for a clear and detailed distribution.
+
+```{r echo=FALSE}
+ggplot(data, aes(x = Gender)) +
+  geom_bar(fill = "blue", color = "black", alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "Gender Distribution of Survey Respondents",
+       x = "Gender",
+       y = "Count")
+```
+
+##We create a bar graph to visualize the distribution of country among survey respondents. The bin width is set to 0.7 for a clear and detailed distribution.
+
+```{r echo=FALSE}
+
+ggplot(data, aes(x = Country)) +
+  geom_bar(fill = "blue", color = "black", alpha = 0.7) +
+  theme_minimal() +
+  coord_flip() +
+  labs(title = "Country Distribution of Survey Respondents",
+       x = "Country",
+       y = "Count")
+```
+
+##We create a bar graph to visualize the distribution of self employed among survey respondents. The bin width is set to 0.7 for a clear and detailed distribution.
+
+```{r echo=FALSE}
+ggplot(data, aes(x = self_employed)) +
+  geom_bar(fill = "blue", color = "black", alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "Self-Employed Distribution of Survey Respondents",
+       x = "Self-Employed",
+       y = "Count")
+```
